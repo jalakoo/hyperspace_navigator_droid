@@ -6,7 +6,7 @@ authors = ["jalakoo <jalakoo@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 streamlit = "^1.33.0"
 hyperspace-navigator-nli = {path = "/Users/jasonkoo/neo4j/repos/hyperspace_navigator_nli"}
 matplotlib = "^3.8.4"
