@@ -1,14 +1,14 @@
 import requests
 from models import System
-from secrets import BASIC_AUTH, PLOTTER_URL
+from secrets import PLOTTER_URL
 
 def post(url, payload) -> list[System]:
     headers = {
         'Content-Type': 'application/json'
         }
 
-    if BASIC_AUTH is not None:
-        headers["Authorization"] = BASIC_AUTH
+    # if BASIC_AUTH is not None:
+    #     headers["Authorization"] = BASIC_AUTH
 
     try:
         response = requests.post(url, data=payload, headers=headers)
