@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "hyperspace-navigator-streamlit"
+version = "0.1.0"
+description = ""
+authors = ["jalakoo <jalakoo@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+streamlit = "^1.33.0"
+hyperspace-navigator-nli = {path = "/Users/jasonkoo/neo4j/repos/hyperspace_navigator_nli"}
+matplotlib = "^3.8.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
