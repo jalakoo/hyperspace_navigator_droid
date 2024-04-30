@@ -1,6 +1,7 @@
 import requests
 from models import System
-from secrets import PLOTTER_URL
+from secrets_util import PLOTTER_URL, OPENAI_KEY
+from openai import OpenAI
 
 def post(url, payload) -> list[System]:
     headers = {
@@ -27,11 +28,10 @@ def post(url, payload) -> list[System]:
         print(f'Problem getting course plot: {e} from url: {url}, payload: {payload}')
         return None
 
-from openai import OpenAI
 
 CLIENT = OpenAI(
     # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=OPENAI_KEY,
 )
 
 def extract_locations(sentence):

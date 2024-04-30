@@ -1,6 +1,6 @@
 from openai import OpenAI
 from plotter import get_plot
-from secrets import OPENAI_KEY
+from secrets_util import OPENAI_KEY
 
 CLIENT = OpenAI(
     # This is the default and can be omitted
