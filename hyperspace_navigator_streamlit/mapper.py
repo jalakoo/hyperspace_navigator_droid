@@ -4,13 +4,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-
 def create_map(
     plot: list[System] = []
 ):
     
     print(f'plot: {plot}')
-    
+
     # Config
     plt.style.use('dark_background')
     fig, ax = plt.subplots()

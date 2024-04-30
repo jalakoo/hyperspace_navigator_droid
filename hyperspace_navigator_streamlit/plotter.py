@@ -1,16 +1,14 @@
 import requests
-import json
-import os
 from models import System
+from secrets import BASIC_AUTH, PLOTTER_URL
 
 def post(url, payload) -> list[System]:
     headers = {
         'Content-Type': 'application/json'
         }
 
-    basic_auth = os.environ.get("PLOTTER_AUTH", None)
-    if basic_auth is not None:
-        headers["Authorization"] = basic_auth
+    if BASIC_AUTH is not None:
+        headers["Authorization"] = BASIC_AUTH
 
     try:
         response = requests.post(url, data=payload, headers=headers)
@@ -65,7 +63,6 @@ def extract_locations(sentence):
 
     return extracted
 
-PLOTTER_URL = os.environ.get("PLOTTER_URL")
 def get_plot(sentence):
     """Get a list of systems and system data for a shortest course plot from one start system to another.
 

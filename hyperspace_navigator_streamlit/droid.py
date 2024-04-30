@@ -1,12 +1,10 @@
 from openai import OpenAI
-# from hyperspace_navigator_nli import get_plot
 from plotter import get_plot
-import json
-import os
+from secrets import OPENAI_KEY
 
 CLIENT = OpenAI(
     # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=OPENAI_KEY,
 )
 
 SYS_PROMPT = f'You are an friendly astro droid from the Star Wars universe. Fulfill navigation queries and general star system related questions for your master pilot. Respond in the style of the character R2-D2, but in English'

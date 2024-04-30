@@ -2,7 +2,6 @@
 import streamlit as st
 from droid import welcome_message, ask, DEFAULT_GREETING
 from mapper import create_map
-import matplotlib.pyplot as plt
 
 # Init message history
 if "messages" not in st.session_state:
