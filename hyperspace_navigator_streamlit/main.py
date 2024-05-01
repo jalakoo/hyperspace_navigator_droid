@@ -3,9 +3,11 @@ import streamlit as st
 from droid import welcome_message, ask, DEFAULT_GREETING
 from mapper import create_map
 
+DROID_IMAGE_URL = 'https://res.cloudinary.com/dk0tizgdn/image/upload/t_Grayscale/v1714600105/r2d2_jk4frc.png'
+USER_IMAGE_URL = 'https://res.cloudinary.com/dk0tizgdn/image/upload/c_scale,e_grayscale,h_100/v1714600105/poe_rdvxqc.png'
+
 # Init message history
 if "messages" not in st.session_state:
-
     st.session_state.messages = [
       {"role": "ai", "content": DEFAULT_GREETING}
     ]
@@ -13,7 +15,7 @@ if "messages" not in st.session_state:
 # Display chat messages from history on app rerun
 with st.empty().container():
   for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    with st.chat_message("ai", avatar=DROID_IMAGE_URL):
         st.markdown(message["content"], unsafe_allow_html=True)
 
 
@@ -22,16 +24,18 @@ user_input = st.chat_input(placeholder="Ask for a plot between 2 known Star Syst
 if user_input:
   with st.empty().container():
     st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
+
+    with st.chat_message("user", avatar=USER_IMAGE_URL):
       st.markdown(user_input)
 
-    with st.chat_message("ai"):
+    with st.chat_message("ai", avatar=DROID_IMAGE_URL):
       with st.spinner('...'):
         message_placeholder = st.empty()
         droid_response, plot = ask(user_input, st.session_state.messages)
         if plot is not None:
             fig = create_map(plot)
             st.pyplot(fig)
+        st.session_state.messages.append({"role": "ai", "content": droid_response})
         
     message_placeholder.markdown(droid_response, unsafe_allow_html=True)
     

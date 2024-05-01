@@ -37,10 +37,12 @@ def welcome_message():
 
     return response.choices[0].message.content
 
-def plotted_answer(plot):
-    PROMPT = f'Return the hyperspace course from the name Stars Systems from the following list of dictionary objects.'
+def plotted_answer(plot, question):
 
     converted_plot = str([s.dict() for s in plot])
+
+    PROMPT = f'Answer questions regarding a hyperspace jump course from a list of dictionary objects. Each dictionary contains information on a single star system. The first item, at index 0, is the starting system, and the final destination is the last system in the list. Make any references to the list as the "plot" or "course": {converted_plot}'
+
 
     response = CLIENT.chat.completions.create(
         model="gpt-4", 
@@ -51,7 +53,7 @@ def plotted_answer(plot):
         },
         {
             "role":"user",
-            "content": converted_plot
+            "content": question
         }
     ],
         max_tokens=400,
@@ -89,4 +91,4 @@ def ask(question: str, messages):
         # TODO: Prepend with fact that plot couldn't be made
         return generic_answer(messages), None
     
-    return plotted_answer(plot), plot
+    return plotted_answer(plot, question), plot
