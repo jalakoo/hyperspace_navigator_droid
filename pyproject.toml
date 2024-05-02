@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "hyperspace-navigator-streamlit"
+name = "hyperspace-navigator-droid"
 version = "0.1.0"
 description = ""
 authors = ["jalakoo <jalakoo@gmail.com>"]

@@ -4,5 +4,5 @@ Streamlit app using a chat bot to plot hyperspace jump courses in the Star Wars 
 ## Running
 ```
 poetry install
-poetry run streamlit run hyperspace_navigator_streamlit/main.py
+poetry run streamlit run hyperspace_navigator_droid/main.py
 ```
