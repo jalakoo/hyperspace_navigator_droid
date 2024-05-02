@@ -1,36 +1,7 @@
 from models import System
-from neo4j import GraphDatabase, basic_auth
-from secrets_util import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE
-import streamlit as st
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-@st.cache_data
-def scan_of_galaxy():
-    query = """
-    MATCH (n:System)
-    WHERE n.name IS NOT NULL AND n.X IS NOT NULL AND n.Y IS NOT NULL
-    RETURN DISTINCT n
-    """
-    # query = """
-    # MATCH (n:System)
-    # WHERE n.name IS NOT NULL AND n.X IS NOT NULL AND n.Y IS NOT NULL
-    # RETURN DISTINCT n.name as name, n.X as x, n.Y as y, n.Region as region, n.type as type, n.importance as importance, n.Link as link
-    # """
-    with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        records, _, _ = driver.execute_query(query, database=NEO4J_DATABASE)
-        result = []
-        for r in records:
-            data = r.data()
-            try:
-                s = System(**data['n'])
-                result.append(s)
-            except Exception as e:
-                print(f'Error parsing system record: {r}. Error: {e}')
-                continue
-        print(f'{len(result)} Systems found')
-        return result
 
 def create_map(
     systems: list[System] = [],

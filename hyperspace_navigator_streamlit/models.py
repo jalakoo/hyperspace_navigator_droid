@@ -12,7 +12,6 @@ class System(BaseModel):
     importance: Optional[float] = 0.0
     Link: Optional[str] = None
 
-
     @validator('importance', pre=True)
     def set_importance_default(cls, v):
         return float(v or 0.0)
