@@ -10,7 +10,7 @@ def system_exists(system: str):
     query = """
     MATCH (n:System)
     WHERE n.name = $systemName
-    RETURN n.name as name, n.X as x, n.Y as y, n.Region as region, n.type as type, n.importance as importance
+    RETURN n
     """
     with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         params = {
@@ -19,8 +19,9 @@ def system_exists(system: str):
         records, _, _ = driver.execute_query(query,params, database=NEO4J_DATABASE)
         result = []
         for r in records:
+            data = r.data()
             try:
-                s = System(**r)
+                s = System(**data['n'])
                 result.append(s)
             except Exception as e:
                 print(f'Error parsing system record: {r}. Error: {e}')
@@ -28,31 +29,64 @@ def system_exists(system: str):
         print(f'{len(result)} matching systems found')
         return len(result) > 0
 
-
-def post(url, payload) -> list[System]:
-    headers = {
-        'Content-Type': 'application/json'
+def get_plot_path(
+        from_system: str,
+        to_system: str,
+        max_jumps: int = 100,
+        exclude_systems: list[str] = [],
+):
+    
+    query = f"""
+        MATCH (start:System {{name: $start_system}})
+        MATCH (end:System {{name: $end_system}}),
+        path = shortestPath((start)-[:CONNECTED_TO|NEAR*0..{max_jumps}]-(end))
+        WHERE ALL(y IN nodes(path) WHERE NOT y.name IN $exclude_systems)
+        RETURN path
+    """
+    with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        params = {
+            'start_system': from_system, 
+            'end_system': to_system,
+            'exclude_systems': exclude_systems
         }
-
-    # if BASIC_AUTH is not None:
-    #     headers["Authorization"] = BASIC_AUTH
+        records, _, _ = driver.execute_query(query,params, database=NEO4J_DATABASE)
 
     try:
-        response = requests.post(url, data=payload, headers=headers)
-
-        content = response.json()
+        nodes = records[0]['path'].nodes
         result = []
-        for s in content:
-            try:
-                system = System(**s)
-                result.append(system)
-            except Exception as e:
-                print(f'Problem system from course plot: {e}, for system: {s}')
-        return result
-    
+        for node in nodes:
+            s = System(**node)
+            result.append(s)
+            # print(f'Node: {node}')
+            # result.append(System(name=node['name'], x=node['X'], y=node['Y'], region=node['Region'], type='Plotted System', importance=node.get('pagerank', 0.0)))
     except Exception as e:
-        print(f'Problem getting course plot: {e} from url: {url}, payload: {payload}')
-        return None
+        print(f'\nError: {e} from query response: {records}')
+        result = []
+    return result
+# def post(url, payload) -> list[System]:
+#     headers = {
+#         'Content-Type': 'application/json'
+#         }
+
+#     # if BASIC_AUTH is not None:
+#     #     headers["Authorization"] = BASIC_AUTH
+
+#     try:
+#         response = requests.post(url, data=payload, headers=headers)
+
+#         content = response.json()
+#         result = []
+#         for s in content:
+#             try:
+#                 system = System(**s)
+#                 result.append(system)
+#             except Exception as e:
+#                 print(f'Problem system from course plot: {e}, for system: {s}')
+#         return result
+    
+#     except Exception as e:
+#         print(f'Problem getting course plot: {e} from url: {url}, payload: {payload}')
+#         return None
 
 
 CLIENT = OpenAI(
@@ -119,6 +153,7 @@ def get_plot(sentence):
 
     # TODO: Fuzzy search match locations if not exact match
 
-    plot = post(PLOTTER_URL, locations)
+    # plot = post(PLOTTER_URL, locations)
+    plot = get_plot_path(from_, to_)
 
     return plot

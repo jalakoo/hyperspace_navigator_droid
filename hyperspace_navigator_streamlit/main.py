@@ -2,7 +2,9 @@
 import streamlit as st
 from droid import welcome_message, ask, DEFAULT_GREETING
 from mapper import scan_of_galaxy, create_map
-
+import pandas as pd
+import altair as alt
+import streamlit.components.v1 as components
 
 # Static Image references
 DROID_IMAGE_URL = 'https://res.cloudinary.com/dk0tizgdn/image/upload/t_Thumbnail/v1714600105/r2d2_jk4frc.png'
@@ -14,11 +16,6 @@ if "messages" not in st.session_state:
       {"role": "assistant", "content": DEFAULT_GREETING}
     ]
 
-# Page setup
-# st.set_page_config(
-#     page_title="Astro Droid Navigator",
-#     layout="wide",
-# )
 # HEADER
 col1, col2 = st.columns([4,1])
 with col1:
@@ -26,10 +23,19 @@ with col1:
 with col2:
     st.image('https://res.cloudinary.com/dk0tizgdn/image/upload/t_Profile/v1714606886/benjamin-cottrell-astralanalyzer_frebud.png', width=80)
 
-# Master star map
-all_systems = scan_of_galaxy()
-fig, ax = create_map(all_systems)
-st.pyplot(fig)
+# Master star map using Altair map
+# all_systems = scan_of_galaxy()
+# all_systems_dict = [s.dict() for s in all_systems]
+# all_systems_df = pd.DataFrame.from_dict(all_systems_dict)
+# c = (
+#    alt.Chart(all_systems_df)
+#    .mark_circle()
+#    .encode(x="X", y="Y", color="importance", tooltip=["name", "Region", "type"])
+# ).interactive()
+# st.altair_chart(c, use_container_width=True)
+
+# Master map using SWGalaxyMap instead
+components.iframe("http://www.swgalaxymap.com/", height=600)
 
 # Display chat messages from history on app rerun
 with st.empty().container():
