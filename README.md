@@ -1,5 +1,5 @@
-# Hyperspace Navigator Streamlit
-Streamlit app using a chat bot to explore hyperspace
+# Hyperspace Navigator Droid
+Streamlit app using a chat bot to plot hyperspace jump courses in the Star Wars Universe
 
 ## Running
 ```
