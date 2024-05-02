@@ -10,7 +10,7 @@ def system_exists(system: str):
     query = """
     MATCH (n:System)
     WHERE n.name = $systemName
-    RETURN n.name as name, n.X as x, n.Y as y, n.Region as region, n.type as type, n.importance as importance
+    RETURN n
     """
     with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         params = {
@@ -19,8 +19,9 @@ def system_exists(system: str):
         records, _, _ = driver.execute_query(query,params, database=NEO4J_DATABASE)
         result = []
         for r in records:
+            data = r.data()
             try:
-                s = System(**r)
+                s = System(**data['n'])
                 result.append(s)
             except Exception as e:
                 print(f'Error parsing system record: {r}. Error: {e}')
@@ -28,7 +29,7 @@ def system_exists(system: str):
         print(f'{len(result)} matching systems found')
         return len(result) > 0
 
-def get_plot(
+def get_plot_path(
         from_system: str,
         to_system: str,
         max_jumps: int = 100,
@@ -51,13 +52,15 @@ def get_plot(
         records, _, _ = driver.execute_query(query,params, database=NEO4J_DATABASE)
 
     try:
-        nodes = path[0]['path'].nodes
+        nodes = records[0]['path'].nodes
         result = []
         for node in nodes:
+            s = System(**node)
+            result.append(s)
             # print(f'Node: {node}')
-            result.append(System(name=node['name'], x=node['X'], y=node['Y'], region=node['Region'], type='Plotted System', importance=node.get('pagerank', 0.0)))
+            # result.append(System(name=node['name'], x=node['X'], y=node['Y'], region=node['Region'], type='Plotted System', importance=node.get('pagerank', 0.0)))
     except Exception as e:
-        print(f'\nError: {e} from query response: {path}')
+        print(f'\nError: {e} from query response: {records}')
         result = []
     return result
 # def post(url, payload) -> list[System]:
@@ -150,6 +153,7 @@ def get_plot(sentence):
 
     # TODO: Fuzzy search match locations if not exact match
 
-    plot = post(PLOTTER_URL, locations)
+    # plot = post(PLOTTER_URL, locations)
+    plot = get_plot_path(from_, to_)
 
     return plot

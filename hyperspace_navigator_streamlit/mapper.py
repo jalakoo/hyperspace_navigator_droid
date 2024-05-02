@@ -48,7 +48,7 @@ def create_map(
 
     # Create
     all_x = [s.X for s in systems]
-    all_y = [s.y for s in systems]
+    all_y = [s.Y for s in systems]
     ax.scatter(all_x, all_y)
 
     # Set Zoom
@@ -66,11 +66,11 @@ def create_map(
     # Course Plot
     if show_plot is True:
         # Show all system names in a plot
-        labels = [o.name for o in systems if o.X is not None and o.y is not None]
+        labels = [o.name for o in systems if o.X is not None and o.Y is not None]
         plt.plot(all_x, all_y, 'b-', linewidth=0.5)
     else:
         # Show only milestone systems in general map
-        labels = [o.name for o in systems if o.X is not None and o.y is not None and o.importance > 0.5]
+        labels = [o.name for o in systems if o.X is not None and o.Y is not None and o.importance > 0.5]
 
     for i, label in enumerate(labels):
         ax.text(all_x[i], all_y[i], label)

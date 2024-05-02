@@ -10,9 +10,6 @@ class System(BaseModel):
     type: Optional[str] = None
     importance: Optional[float] = 0.0
     Link: Optional[str] = None
-    # pagerank : Optional[float] = 0.0
-    # centrality : Optional[float] = 0.0
-    # affiliation: Optional[str] = "Unknown"
 
 
     @validator('importance', pre=True)
