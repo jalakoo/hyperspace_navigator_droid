@@ -34,8 +34,12 @@ with col2:
 # ).interactive()
 # st.altair_chart(c, use_container_width=True)
 
-# Master map using SWGalaxyMap instead
-components.iframe("http://www.swgalaxymap.com/", height=600)
+# Master map using SWGalaxyMap instead - does not work in Streamlit cloud
+# components.iframe("http://www.swgalaxymap.com/", height=600)
+
+# display = f'<iframe src="http://www.swgalaxymap.com/" width="100%" height="1000px"></iframe>'
+display = f'<iframe src="https://hbernberg.carto.com/builder/6650a85d-b115-4680-ab97-721bf8a41a90/embed" width="100%" height="600" frameborder="0" allowfullscreen="allowfullscreen"></iframe><p><cite><small>Embedded interactive map by <a href="http://www.swgalaxymap.com/">SWGalaxyMap</a>. Star Wars is a trademark and copyright of Lucasfilm and Disney.</small></cite></p>'
+st.markdown(display, unsafe_allow_html=True)
 
 # Display chat messages from history on app rerun
 with st.empty().container():
