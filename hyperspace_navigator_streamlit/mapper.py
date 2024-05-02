@@ -1,14 +1,39 @@
 from models import System
+from neo4j import GraphDatabase, basic_auth
+from secrets_util import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE
 import streamlit as st
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+@st.cache_data
+def scan_of_galaxy():
+    query = """
+    MATCH (n:System)
+    WHERE n.name IS NOT NULL AND n.X IS NOT NULL AND n.Y IS NOT NULL
+    RETURN DISTINCT n.name as name, n.X as x, n.Y as y, n.Region as region, n.type as type, n.importance as importance
+    """
+    with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        records, _, _ = driver.execute_query(query, database=NEO4J_DATABASE)
+        result = []
+        for r in records:
+            try:
+                s = System(**r)
+                result.append(s)
+            except Exception as e:
+                print(f'Error parsing system record: {r}. Error: {e}')
+                continue
+        print(f'{len(result)} Systems found')
+        return result
+
 def create_map(
-    plot: list[System] = []
+    systems: list[System] = [],
+    show_plot: bool = False
 ):
     
-    print(f'plot: {plot}')
+    if systems is None or len(systems) == 0:
+        print('No system data provided')
+        return None, None
 
     # Config
     plt.style.use('dark_background')
@@ -16,8 +41,8 @@ def create_map(
     ax.grid(color='white')
 
     # Create
-    all_x = [s.x for s in plot]
-    all_y = [s.y for s in plot]
+    all_x = [s.x for s in systems]
+    all_y = [s.y for s in systems]
     ax.scatter(all_x, all_y)
 
     # Set Zoom
@@ -31,13 +56,17 @@ def create_map(
         print(f'Problem calculating min/max: {e} from all_x: {all_x} and all_y: {all_y}')
     plt.xlim(min_x, max_x)  # Set x-axis limits to zoom in
     plt.ylim(min_y, max_y)  # Set y-axis limits to zoom in
-
-    # Node Label
-    labels = [o.name for o in plot if o.x is not None and o.y is not None]
-    for i, label in enumerate(labels):
-        ax.text(all_x[i], all_y[i], label)
     
     # Course Plot
-    plt.plot(all_x, all_y, 'b-', linewidth=0.5)
+    if show_plot is True:
+        # Show all system names in a plot
+        labels = [o.name for o in systems if o.x is not None and o.y is not None]
+        plt.plot(all_x, all_y, 'b-', linewidth=0.5)
+    else:
+        # Show only milestone systems in general map
+        labels = [o.name for o in systems if o.x is not None and o.y is not None and o.importance > 0.5]
 
-    return fig
+    for i, label in enumerate(labels):
+        ax.text(all_x[i], all_y[i], label)
+
+    return (fig, ax)

@@ -1,5 +1,5 @@
 from openai import OpenAI
-from plotter import get_plot
+from plotter import get_plot, InvalidEndLocation, InvalidStartLocation
 from secrets_util import OPENAI_KEY
 
 CLIENT = OpenAI(
@@ -37,7 +37,7 @@ def welcome_message():
 
     return response.choices[0].message.content
 
-def plotted_answer(plot, question):
+def plotted_answer(plot, question)-> str:
 
     converted_plot = str([s.dict() for s in plot])
 
@@ -68,27 +68,34 @@ def plotted_answer(plot, question):
 
 def generic_answer(messages):
 
+    # TODO: Add a prompt that course could not be found
+
     response = CLIENT.chat.completions.create(
         model="gpt-4", 
         messages=messages,
-        max_tokens=60,
+        max_tokens=200,
         n=1,
         stop=None,
         temperature=0.5,
     )
 
-    return response
+    return response.choices[0].message.content
 
 def ask(question: str, messages):
 
     # Attempt to return DB vetted shorted path plot
-    plot = get_plot(question)
-
-    print(f'\nFirst plot data: {plot[0]}')
-    print(f'\njumps in plot returned: {len(plot)}')
-
+    try:
+        plot = get_plot(question)
+    except InvalidStartLocation as e:
+        return f"I'm afraid {e} is an uncharted or unknown system. Could you please rephrase your question with known origin?"
+    except InvalidEndLocation as e:
+        return f"I'm afraid {e} is an uncharted or unknown system. Could you please rephrase your question with known destination?"
+   
     if plot == [] or plot is None:
+        print("No plot data available for that query. Responding generically...")
         # TODO: Prepend with fact that plot couldn't be made
         return generic_answer(messages), None
     
+    print(f'\nFirst plot data: {plot[0]}')
+    print(f'\njumps in plot returned: {len(plot)}')
     return plotted_answer(plot, question), plot
