@@ -1,7 +1,33 @@
 import requests
 from models import System
-from secrets_util import PLOTTER_URL, OPENAI_KEY
+from neo4j import GraphDatabase, basic_auth
+from secrets_util import PLOTTER_URL, OPENAI_KEY, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE
 from openai import OpenAI
+import streamlit as st
+import json
+@st.cache_data
+def system_exists(system: str):
+    query = """
+    MATCH (n:System)
+    WHERE n.name = $systemName
+    RETURN n.name as name, n.X as x, n.Y as y, n.Region as region, n.type as type, n.importance as importance
+    """
+    with GraphDatabase.driver(NEO4J_URI, auth=basic_auth(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        params = {
+            "systemName": system
+        }
+        records, _, _ = driver.execute_query(query,params, database=NEO4J_DATABASE)
+        result = []
+        for r in records:
+            try:
+                s = System(**r)
+                result.append(s)
+            except Exception as e:
+                print(f'Error parsing system record: {r}. Error: {e}')
+                continue
+        print(f'{len(result)} matching systems found')
+        return len(result) > 0
+
 
 def post(url, payload) -> list[System]:
     headers = {
@@ -34,7 +60,7 @@ CLIENT = OpenAI(
     api_key=OPENAI_KEY,
 )
 
-def extract_locations(sentence):
+def extract_locations(sentence)->str:
 
     prompt = f'You are a navigation droid from the Star Wars universe. Extract the from and to star systems from a sentence and return a json object with the keys "from" and "to", like {{"from":"Alderaan", "to":"Coruscant"}}.'
 
@@ -63,6 +89,11 @@ def extract_locations(sentence):
 
     return extracted
 
+class InvalidStartLocation(Exception):
+    pass
+class InvalidEndLocation(Exception):
+    pass
+
 def get_plot(sentence):
     """Get a list of systems and system data for a shortest course plot from one start system to another.
 
@@ -73,8 +104,19 @@ def get_plot(sentence):
         list: List of dictionaries containing system data for course, starting with origin/start system and ending with destination/end system.
     """
     locations = extract_locations(sentence)
-    
-    # TODO: Validate format and locations are available
+
+    # Verify locations are valid systems
+    print(f'Locations type: {type(locations)}')
+    locations_dict = json.loads(locations)
+    from_ = locations_dict['from']
+    to_ = locations_dict['to']
+    from_exists = system_exists(from_)
+    to_exists = system_exists(to_)
+    if from_exists is False:
+        raise InvalidStartLocation(from_)  
+    if to_exists is False:
+        raise InvalidEndLocation(to_)
+
     # TODO: Fuzzy search match locations if not exact match
 
     plot = post(PLOTTER_URL, locations)
