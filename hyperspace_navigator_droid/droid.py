@@ -106,7 +106,7 @@ def synthesize_answer(question, info):
     return response.choices[0].message.content
 def is_asking_for_a_plot(question)-> bool:
 
-    PROMPT = f'You are a navigation subprocessing unit. Determine if the user is asking for directions, a hyperspace plot course, or information from a list of star systems. Respond with only "True" or "False".'
+    PROMPT = f'You are a navigation subprocessing unit. Determine if the user is asking for directions or information that can be determined from a course represented by a list of star systems. Respond with only "True" or "False". Example valid questions: "How do I get from Bespin to Hoth?", "How many hyperspace jumps are there between Eadu and Naboo?", "Is Eadu between Mandalore and Dathomir"'
 
     response = CLIENT.chat.completions.create(
         model="gpt-3.5-turbo", 
@@ -206,13 +206,13 @@ def extract_single_location(sentence)->str:
 
     return extracted
 
-def get_system_answer(question):
+def get_system_answer(question, messages):
     system_name = extract_single_location(question)
     if system_name is None or system_name == "":
         return generic_answer(question), None
     system = get_system_info(system_name)
     if system is None:
-        return generic_answer(question), None
+        return generic_answer(messages), None
     return synthesize_answer(question, system), None
 
 def ask(question: str, messages):
@@ -227,8 +227,7 @@ def ask(question: str, messages):
     request_system_info = is_asking_about_a_system(question)
     print(f'Is asking for system info: {request_system_info}')
     if request_system_info is True:
-        return get_system_answer(question)
+        return get_system_answer(question, messages)
     
     # Fallback
-    return generic_answer(question, messages), None
-
+    return generic_answer(messages), None

@@ -107,10 +107,12 @@ def get_plot_path(
         nodes = records[0]['path'].nodes
         result = []
         for node in nodes:
-            s = System(**node)
-            result.append(s)
-            # print(f'Node: {node}')
-            # result.append(System(name=node['name'], x=node['X'], y=node['Y'], region=node['Region'], type='Plotted System', importance=node.get('pagerank', 0.0)))
+            try:
+                s = System(**node)
+                result.append(s)
+            except Exception as e:
+                print(f'Error parsing system record: {node}. Error: {e}')
+                continue
     except Exception as e:
         print(f'\nError: {e} from query response: {records}')
         result = []

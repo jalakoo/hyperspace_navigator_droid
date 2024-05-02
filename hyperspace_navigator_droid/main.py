@@ -35,6 +35,7 @@ with st.empty().container():
 user_input = st.chat_input(placeholder="Ask for a plot between 2 known Star Systems", key="user_input")
 
 if user_input:
+
     with st.empty().container():
         st.session_state.messages.append({"role": "user", "content": user_input})
 
