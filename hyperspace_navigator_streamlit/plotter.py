@@ -1,4 +1,3 @@
-import requests
 from models import System
 from neo4j import GraphDatabase, basic_auth
 from secrets_util import PLOTTER_URL, OPENAI_KEY, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE

@@ -6,7 +6,8 @@ class System(BaseModel):
     name: str
     X: float
     Y: float
-    Region: str
+    description: Optional[str] = None
+    Region: Optional[str] = None
     type: Optional[str] = None
     importance: Optional[float] = 0.0
     Link: Optional[str] = None
