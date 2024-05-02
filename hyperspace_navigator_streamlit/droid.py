@@ -44,7 +44,6 @@ def plotted_answer(plot, question)-> str:
 
     PROMPT = f'Answer questions regarding a hyperspace jump course from a list of dictionary objects. Each dictionary contains information on a single star system. The first item, at index 0, is the starting system, and the final destination is the last system in the list. Make any references to the list as the "plot" or "course": {converted_plot}'
 
-
     response = CLIENT.chat.completions.create(
         model="gpt-4", 
         messages=[
@@ -69,7 +68,7 @@ def plotted_answer(plot, question)-> str:
 
 def generic_answer(messages):
 
-    # TODO: Add a prompt that course could not be found
+    # TODO: Add a prompt that other tools could not find answer
 
     response = CLIENT.chat.completions.create(
         model="gpt-4", 
@@ -218,13 +217,18 @@ def get_system_answer(question):
 
 def ask(question: str, messages):
 
+    # Plot question?
     request_plot = is_asking_for_a_plot(question)
     print(f'Is asking for a plot: {request_plot}')
     if request_plot is True:
         return get_plot_answer(question)
+    
+    # General information on a system?
     request_system_info = is_asking_about_a_system(question)
     print(f'Is asking for system info: {request_system_info}')
     if request_system_info is True:
         return get_system_answer(question)
+    
+    # Fallback
     return generic_answer(question, messages), None
 

@@ -1,10 +1,7 @@
 
 import streamlit as st
 from droid import welcome_message, ask, DEFAULT_GREETING
-from mapper import scan_of_galaxy, create_map
-import pandas as pd
-import altair as alt
-import streamlit.components.v1 as components
+from mapper import create_map
 
 # Static Image references
 DROID_IMAGE_URL = 'https://res.cloudinary.com/dk0tizgdn/image/upload/t_Thumbnail/v1714600105/r2d2_jk4frc.png'
@@ -23,21 +20,7 @@ with col1:
 with col2:
     st.image('https://res.cloudinary.com/dk0tizgdn/image/upload/t_Profile/v1714606886/benjamin-cottrell-astralanalyzer_frebud.png', width=80)
 
-# Master star map using Altair map
-# all_systems = scan_of_galaxy()
-# all_systems_dict = [s.dict() for s in all_systems]
-# all_systems_df = pd.DataFrame.from_dict(all_systems_dict)
-# c = (
-#    alt.Chart(all_systems_df)
-#    .mark_circle()
-#    .encode(x="X", y="Y", color="importance", tooltip=["name", "Region", "type"])
-# ).interactive()
-# st.altair_chart(c, use_container_width=True)
-
-# Master map using SWGalaxyMap instead - does not work in Streamlit cloud
-# components.iframe("http://www.swgalaxymap.com/", height=600)
-
-# display = f'<iframe src="http://www.swgalaxymap.com/" width="100%" height="1000px"></iframe>'
+# Master star map from swgalaxymap
 display = f'<iframe src="https://hbernberg.carto.com/builder/6650a85d-b115-4680-ab97-721bf8a41a90/embed" width="100%" height="600" frameborder="0" allowfullscreen="allowfullscreen"></iframe><p><cite><small>Embedded interactive map by <a href="http://www.swgalaxymap.com/">SWGalaxyMap</a>. Star Wars is a trademark and copyright of Lucasfilm and Disney.</small></cite></p>'
 st.markdown(display, unsafe_allow_html=True)
 
