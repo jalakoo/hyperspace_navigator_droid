@@ -7,10 +7,6 @@ OPENAI_KEY = os.environ.get("OPENAI_API_KEY", None)
 if OPENAI_KEY is None:
         OPENAI_KEY = st.secrets["OPENAI_API_KEY"]
 
-PLOTTER_URL = os.environ.get("PLOTTER_URL", None)
-if PLOTTER_URL is None:
-    plotter_url = st.secrets["PLOTTER_URL"]
-
 NEO4J_URI = os.environ.get("NEO4J_URI", None)
 if NEO4J_URI is None:
     NEO4J_URI = st.secrets["NEO4J_URI"]
